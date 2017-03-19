@@ -81,7 +81,10 @@ public static class AssetBundleCompressor
             outputFile.Flush ();
             outputFile.Close ();
 
-            Debug.LogFormat ("Reducled to {0:F2}% | {1} => {2}", 100.0f * output_length / data.Length, data.Length, output_length);
+            Debug.LogFormat ("Reducled to {0:F2}% | {1}:{2} => {3}:{4}",
+                100.0f * output_length / data.Length,
+                inputPath, data.Length,
+                outputPath, output_length);
         }
     }
 
@@ -89,6 +92,7 @@ public static class AssetBundleCompressor
     {
         byte[] data;
         int orig_size;
+        long archive_size;
         using (var inputFile = new FileStream (inputPath, FileMode.Open, FileAccess.Read)) {
             var buffer = new byte[4];
             inputFile.Read (buffer, 0, 4);
@@ -110,13 +114,16 @@ public static class AssetBundleCompressor
             default:
                 throw new Exception ("Unknown header");
             }
+            archive_size = inputFile.Length;
             inputFile.Close ();
         }
 
         var buf = ExpandBlocks (data, orig_size);
         WriteFile (outputPath, buf);
 
-        Debug.LogFormat ("Inflate {0} => {1}", data.Length, buf.Length);
+        Debug.LogFormat ("Inflate {0}:{1} => {2}:{3}",
+            inputPath, archive_size,
+            outputPath, buf.Length);
     }
 
     const uint MAGIC_RAW = 0x99ee0000U;
