@@ -70,7 +70,7 @@ public static class AssetBundleCompressor
                         Int32 dictSize32 = (Int32)LZMA_DICT_SIZE;
                         coder.SetCoderProperties (new SevenZip.CoderPropID[] { SevenZip.CoderPropID.DictionarySize }, new object[] { dictSize32 });
                         coder.WriteCoderProperties (outputFile);
-                        outputFile.Write (BitConverter.GetBytes (buf.Length), 0, 4);
+                        outputFile.Write (int2bytes (buf.Length), 0, 4);
                         coder.Code (m, outputFile, buf.Length, -1, null);
                     }
                 }
@@ -449,7 +449,7 @@ public static class AssetBundleCompressor
             stream.Read (properties, 0, 5);
             byte[] fileLengthBytes = new byte[4];
             stream.Read (fileLengthBytes, 0, 4);
-            long fileLength = BitConverter.ToInt32 (fileLengthBytes, 0);
+            long fileLength = bytes2int (fileLengthBytes, 0);
             coder.SetDecoderProperties (properties);
             coder.Code (stream, output, stream.Length, fileLength, null);
             output.Flush ();
